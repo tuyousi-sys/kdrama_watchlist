@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✦ Kドラマ リスト</title>
+<style>
+  :root{
+    --pink-bg:#faf1ef;
+    --card-bg:#ffffff;
+    --border:#ecd4d1;
+    --maroon:#7a1f3d;
+    --maroon-dark:#4f1327;
+    --accent:#e8547a;
+    --accent-dark:#c53a5e;
+    --text:#2b1f22;
+    --muted:#8a7477;
+    --shadow:0 2px 8px rgba(122,31,61,0.06);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;
+    background:var(--pink-bg);
+    color:var(--text);
+    display:flex;
+    justify-content:center;
+    padding:0 0 60px;
+    line-height:1.5;
+  }
+  .app{
+    width:100%;
+    max-width:600px;
+    min-height:100vh;
+    background:var(--pink-bg);
+  }
+
+  /* Header */
+  header{
+    background:linear-gradient(135deg, var(--maroon), var(--maroon-dark));
+    color:#fff;
+    padding:26px 24px 28px;
+    border-radius:0 0 28px 28px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    box-shadow:0 4px 16px rgba(122,31,61,0.25);
+    position:sticky;
+    top:0;
+    z-index:10;
+  }
+  header .titles{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  header .label{
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:3px;
+    opacity:0.75;
+  }
+  header h1{
+    margin:0;
+    font-size:26px;
+    font-weight:800;
+    letter-spacing:0.5px;
+  }
+  header .stats{
+    display:flex;
+    gap:14px;
+    font-size:13px;
+    margin-top:2px;
+  }
+  header .stats span.dot{
+    display:inline-block;
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    margin-right:5px;
+  }
+  header .stats .watched-dot{ background:#f8b4c4; }
+  header .stats .unwatched-dot{ background:#ffe1a8; }
+  header .count-box{
+    background:rgba(255,255,255,0.18);
+    border-radius:16px;
+    padding:10px 18px;
+    text-align:center;
+    min-width:64px;
+  }
+  header .count-box .num{
+    font-size:24px;
+    font-weight:800;
+    line-height:1;
+  }
+  header .count-box .lbl{
+    font-size:9px;
+    font-weight:700;
+    letter-spacing:1.5px;
+    opacity:0.85;
+    margin-top:4px;
+  }
+
+  /* Controls */
+  .controls{
+    padding:22px 20px 4px;
+  }
+  .add-row{
+    display:flex;
+    gap:10px;
+    margin-bottom:16px;
+  }
+  .add-row input{
+    flex:1;
+    padding:15px 18px;
+    border-radius:16px;
+    border:1.5px solid var(--border);
+    background:var(--card-bg);
+    font-size:15px;
+    outline:none;
+    color:var(--text);
+    box-shadow:var(--shadow);
+  }
+  .add-row input:focus{
+    border-color:var(--accent);
+  }
+  .add-btn{
+    width:52px;
+    height:52px;
+    border-radius:16px;
+    border:none;
+    background:var(--accent);
+    color:#fff;
+    font-size:24px;
+    font-weight:700;
+    cursor:pointer;
+    flex-shrink:0;
+    box-shadow:0 3px 10px rgba(232,84,122,0.35);
+    transition:background 0.15s;
+  }
+  .add-btn:hover{ background:var(--accent-dark); }
+  .add-btn:active{ transform:scale(0.96); }
+
+  .search-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:16px;
+    font-size:13px;
+  }
+  .search-row .search-wrap{
+    flex:1;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:11px 16px;
+    border-radius:14px;
+    background:var(--card-bg);
+    border:1.5px solid var(--border);
+  }
+  .search-row .search-wrap:focus-within{
+    border-color:var(--accent);
+  }
+  .search-row input{
+    border:none;
+    outline:none;
+    background:transparent;
+    flex:1;
+    font-size:14px;
+    color:var(--text);
+  }
+  .search-row .clear-btn{
+    border:none;
+    background:none;
+    color:var(--accent);
+    font-weight:700;
+    font-size:13px;
+    cursor:pointer;
+    white-space:nowrap;
+    padding:4px 6px;
+  }
+
+  .tabs{
+    display:flex;
+    gap:10px;
+    padding:0 20px 18px;
+    position:sticky;
+    top:0;
+    background:var(--pink-bg);
+    z-index:5;
+  }
+  .tab{
+    flex:1;
+    text-align:center;
+    padding:10px 0;
+    border-radius:20px;
+    border:1.5px solid var(--border);
+    background:var(--card-bg);
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    color:var(--text);
+    transition:all 0.15s;
+  }
+  .tab:hover{ border-color:var(--accent); }
+  .tab.active{
+    background:var(--maroon);
+    color:#fff;
+    border-color:var(--maroon);
+    box-shadow:0 3px 10px rgba(122,31,61,0.3);
+  }
+
+  .section-label{
+    padding:4px 22px 10px;
+    font-size:12px;
+    font-weight:700;
+    color:var(--muted);
+    letter-spacing:0.5px;
+  }
+
+  /* List */
+  .list{
+    padding:0 20px 30px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .item{
+    background:var(--card-bg);
+    border:1.5px solid var(--border);
+    border-radius:18px;
+    padding:16px 18px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    box-shadow:var(--shadow);
+    transition:opacity 0.15s;
+  }
+  .item.watched{
+    background:#fdf6f7;
+    border-color:#f2e0e0;
+  }
+  .item.watched .name{
+    text-decoration:line-through;
+    color:var(--muted);
+  }
+  .check{
+    width:26px;
+    height:26px;
+    border-radius:50%;
+    border:2.5px solid var(--border);
+    background:#fff;
+    cursor:pointer;
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0;
+    transition:all 0.15s;
+  }
+  .check:hover{ border-color:var(--accent); }
+  .item.watched .check{
+    background:var(--accent);
+    border-color:var(--accent);
+  }
+  .check svg{ display:none; width:14px; height:14px; }
+  .item.watched .check svg{ display:block; }
+  .name{
+    flex:1;
+    font-size:15.5px;
+    font-weight:500;
+    line-height:1.45;
+    word-break:break-word;
+  }
+  .del{
+    border:none;
+    background:#f7ecec;
+    color:var(--muted);
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    font-size:16px;
+    cursor:pointer;
+    flex-shrink:0;
+    transition:all 0.15s;
+  }
+  .del:hover{ color:#fff; background:var(--accent); }
+
+  .empty{
+    text-align:center;
+    color:var(--muted);
+    font-size:14px;
+    padding:60px 20px;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="titles">
+      <div class="label">MY WATCHLIST</div>
+      <h1>✦ Kドラマ リスト</h1>
+      <div class="stats">視聴済み <span id="watchedCount">0</span>本 ／ 未視聴 <span id="unwatchedCount">0</span>本</div>
+    </div>
+    <div class="count-box">
+      <div class="num" id="totalCount">0</div>
+      <div class="lbl">TITLES</div>
+    </div>
+  </header>
+
+  <div class="controls">
+    <div class="add-row">
+      <input type="text" id="newTitle" placeholder="作品名を入力してください">
+      <button class="add-btn" id="addBtn">＋</button>
+    </div>
+    <div class="search-row">
+      <div class="search-wrap">
+        <span>🔍</span>
+        <input type="text" id="searchInput" placeholder="作品名で検索">
+      </div>
+      <button class="clear-btn" id="clearBtn">クリア</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-filter="all">すべて</div>
+    <div class="tab" data-filter="unwatched">未視聴</div>
+    <div class="tab" data-filter="watched">視聴済み</div>
+  </div>
+
+  <div class="list" id="list"></div>
+</div>
+
+<script>
+const STORAGE_KEY = "kdrama_watchlist_items";
+
+const defaultTitles = [
+"10DANCE","50%の人生リスタート","TOKYOタクシー","アドレセンス","あなたが殺した",
+"アンダーカバーハイスクール","エージェント・キム:リアクティベーテッド",
+"エノーラ・ホームズの事件簿1・2・3","ジェントルメン","ドクターシン〜欲望のの解剖〜","トリガー",
+"トングン〜呪いの宮〜","ブラッド・ハウンド1-2","プロボノ〜あなたの正義救います",
+"マンジャーレ！〜ノンナのレストランへようこそ〜","マンションのお仕事","ワンダーフルーズ","九重紫",
+"元カレは天才詐欺師〜38師機動隊〜","孤島のエリートドクター","殺し屋たちの店","殺し屋たちの店2",
+"素晴らしき新世界","鉄槌教師","伝説のキッチンソルジャー","爆弾","盤上の向日葵","夫婦の結末","恋は命がけ"
+];
+
+function loadItems(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      return JSON.parse(raw);
+    }
+  }catch(e){}
+  return defaultTitles.map((t,i)=>({id: "t"+i+"_"+Date.now(), name: t, watched:false}));
+}
+
+function saveItems(items){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  }catch(e){}
+}
+
+let items = loadItems();
+let filter = "all";
+let query = "";
+
+const listEl = document.getElementById("list");
+const totalCountEl = document.getElementById("totalCount");
+const watchedCountEl = document.getElementById("watchedCount");
+const unwatchedCountEl = document.getElementById("unwatchedCount");
+const newTitleInput = document.getElementById("newTitle");
+const addBtn = document.getElementById("addBtn");
+const searchInput = document.getElementById("searchInput");
+const clearBtn = document.getElementById("clearBtn");
+const tabs = document.querySelectorAll(".tab");
+
+function render(){
+  const watchedN = items.filter(i=>i.watched).length;
+  totalCountEl.textContent = items.length;
+  watchedCountEl.textContent = watchedN;
+  unwatchedCountEl.textContent = items.length - watchedN;
+
+  let visible = items;
+  if(filter === "watched") visible = visible.filter(i=>i.watched);
+  if(filter === "unwatched") visible = visible.filter(i=>!i.watched);
+  if(query.trim()){
+    visible = visible.filter(i=>i.name.includes(query.trim()));
+  }
+
+  listEl.innerHTML = "";
+  if(visible.length === 0){
+    const empty = document.createElement("div");
+    empty.className = "empty";
+    empty.textContent = "該当する作品がありません";
+    listEl.appendChild(empty);
+    return;
+  }
+
+  visible.forEach(item=>{
+    const row = document.createElement("div");
+    row.className = "item" + (item.watched ? " watched" : "");
+
+    const check = document.createElement("button");
+    check.className = "check";
+    check.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+    check.addEventListener("click", ()=>{
+      item.watched = !item.watched;
+      saveItems(items);
+      render();
+    });
+
+    const name = document.createElement("div");
+    name.className = "name";
+    name.textContent = item.name;
+
+    const del = document.createElement("button");
+    del.className = "del";
+    del.textContent = "×";
+    del.addEventListener("click", ()=>{
+      if(!confirm(item.name + " を削除しますか?")) return;
+      items = items.filter(i=>i.id !== item.id);
+      saveItems(items);
+      render();
+    });
+
+    row.appendChild(check);
+    row.appendChild(name);
+    row.appendChild(del);
+    listEl.appendChild(row);
+  });
+}
+
+function addItem(){
+  const val = newTitleInput.value.trim();
+  if(!val) return;
+  items.unshift({ id: "t_"+Date.now()+"_"+Math.random().toString(36).slice(2), name: val, watched:false });
+  newTitleInput.value = "";
+  saveItems(items);
+  render();
+}
+
+addBtn.addEventListener("click", addItem);
+newTitleInput.addEventListener("keydown", (e)=>{
+  if(e.key === "Enter") addItem();
+});
+
+searchInput.addEventListener("input", (e)=>{
+  query = e.target.value;
+  render();
+});
+clearBtn.addEventListener("click", ()=>{
+  query = "";
+  searchInput.value = "";
+  render();
+});
+
+tabs.forEach(tab=>{
+  tab.addEventListener("click", ()=>{
+    tabs.forEach(t=>t.classList.remove("active"));
+    tab.classList.add("active");
+    filter = tab.dataset.filter;
+    render();
+  });
+});
+
+saveItems(items);
+render();
+</script>
+</body>
+</html>
